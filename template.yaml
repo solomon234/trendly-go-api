@@ -1,0 +1,44 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  sam-trendly-go-api
+  Using a SAM Template to create an api with api gateway and lambda. 
+
+Globals:
+  Function:
+    Timeout: 5
+    MemorySize: 128
+    Tracing: Active
+  Api:
+    TracingEnabled: true
+
+Resources:
+  Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: /trendly-go-api
+      Handler: trendly-go-api
+      Runtime: go1.x
+      Architectures:
+      - x86_64
+      Events:
+        CatchAll:
+          Type: Api 
+          Properties:
+            Path: /socials
+            Method: GET
+      Environment: 
+        Variables:
+          TIK_TOK_API_URL: https://api.tikapi.io/
+          TIK_TOK_API_KEY: eopb58ZptKmmFYpowRbamKdZvwp4bLZ0eQrUVifX7PJd4cu3
+
+Outputs:
+  TrendlyAPI:
+    Description: API Gateway endpoint URL for Prod environment for First Function
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/socials/"
+  TrendlyAPIFunction:
+    Description: Trendly API Function ARN
+    Value: !GetAtt TrendlyFunction.Arn
+  TrendlyFunctionIamRole:
+    Description: Implicit IAM Role created for Trendly function
+    Value: !GetAtt TrendlyFunctionRole.Arn
